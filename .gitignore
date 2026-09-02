@@ -1,0 +1,39 @@
+# ============================================================
+# Barcode Detection - .gitignore
+# ============================================================
+
+# === 数据集（绝对不上传，太大了） ===
+data/
+**/datasets/
+**/dataset/
+
+# === 训练输出 ===
+runs/
+weights/*.pt
+*.part
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS ===
+Thumbs.db
+.DS_Store
+
+# === 临时 patch 文件（开发过程中的调试脚本） ===
+patch_*.py
+
+# === 大模型权重（本地文件，GitHub 存不下） ===
+*.pt
+*.onnx
+*.engine
