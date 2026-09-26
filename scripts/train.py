@@ -59,11 +59,18 @@ import torch
 from ultralytics import YOLO
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_YAML = PROJECT_ROOT / "data" / "barcode_only" / "data.yaml"
+# 可用 DATA 环境变量指向别的数据集（例如去重后的 data/barcode_dedup/data.yaml）
+DATA_YAML = Path(os.environ.get("DATA",
+                 str(PROJECT_ROOT / "data" / "barcode_only" / "data.yaml")))
 PRETRAIN = PROJECT_ROOT / "weights" / "yolov8n.pt"
 RUNS_DIR = PROJECT_ROOT / "runs"
 
 QUICK = os.environ.get("QUICK") == "1"
+# 时间预算可调，例如：EPOCHS=60 BATCH=16 python scripts/train.py
+EPOCHS = int(os.environ.get("EPOCHS", "100"))
+BATCH = int(os.environ.get("BATCH", "16"))
+WORKERS = int(os.environ.get("WORKERS", "0"))
+RUN_NAME = os.environ.get("NAME", "barcode_hifi_v2")
 
 
 def pick_device():
@@ -102,8 +109,8 @@ def main():
         patience=20,
         save=True,
         project=str(RUNS_DIR),
-        name="barcode_hifi_v2",
-        workers=0,
+        name=RUN_NAME,
+        workers=WORKERS,
         verbose=True,
     )
 
@@ -121,9 +128,9 @@ def main():
         )
     else:
         model.train(
-            epochs=100,
+            epochs=EPOCHS,
             fraction=1.0,          # 全量数据
-            batch=16,              # 8GB 显存 imgsz=640 可用；OOM 就改成 8 或 4
+            batch=BATCH,           # 8GB 显存 imgsz=640 可用；OOM 就改成 8 或 4
             cache="disk",          # 磁盘缓存，避免内存爆
             # ---- 数据增强：专门针对倒置/反光/倾斜/曲面 ----
             degrees=180,           # 关键：支持 90/180 旋转，治倒置漏检
